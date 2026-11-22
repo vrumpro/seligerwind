@@ -1294,8 +1294,8 @@ footer.site-footer{margin-top:16px;padding:56px 0 24px;background:#102338}
 .help-contact-section.territory-help{padding-top:40px;padding-bottom:0}
 .help-contact-section .faq-contact-action{grid-template-columns:minmax(0,1fr) 420px;gap:0;padding:0;overflow:hidden;min-height:250px}
 .help-contact-section .faq-contact-action>div:first-child{max-width:none;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:38px 40px;min-height:250px;background-size:cover;background-position:center}
-.home-help .faq-contact-action>div:first-child{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.36)),url('assets/winter-1.webp');background-position:center 58%}
-.territory-help .faq-contact-action>div:first-child{background-image:linear-gradient(90deg,rgba(9,27,43,.86),rgba(9,27,43,.35)),url('assets/complex-tropical-poster.webp');background-position:center 60%}
+.home-help .faq-contact-action>div:first-child{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.36)),url('assets/winter-1-mobile.webp');background-position:center 58%}
+.territory-help .faq-contact-action>div:first-child{background-image:linear-gradient(90deg,rgba(9,27,43,.86),rgba(9,27,43,.35)),url('assets/complex-tropical-banner.webp');background-position:center 60%}
 .help-contact-section .faq-contact-action h3{color:#fff;max-width:440px;font-size:30px;text-wrap:balance}
 .help-contact-section .faq-contact-action p{color:#e4ebf1;max-width:430px;line-height:1.8}
 .help-contact-section .faq-contact-options{padding:32px;border:0;align-self:center}
@@ -1315,9 +1315,9 @@ footer.site-footer{margin-top:16px;padding:56px 0 24px;background:#102338}
 #faq .faq-contact-action>div:first-child{position:relative;isolation:isolate;align-self:stretch;display:flex;flex-direction:column;justify-content:center;max-width:none;min-height:200px;padding:26px 40px;background:#eaf0f4;overflow:hidden}
 .help-contact-section .faq-contact-action>div:first-child:after,
 #faq .faq-contact-action>div:first-child:after{content:"";position:absolute;z-index:-1;inset:0 0 0 43%;background-size:cover;background-position:center;mask-image:linear-gradient(90deg,transparent,#000 45%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 45%)}
-.home-help .faq-contact-action>div:first-child:after{background-image:url('assets/winter-1.webp');background-position:58% 55%}
-.territory-help .faq-contact-action>div:first-child:after{background-image:url('assets/complex-tropical-poster.webp');background-position:58% 60%}
-#faq .faq-contact-action>div:first-child:after{background-image:url('assets/winter-2.webp');background-position:60% 50%}
+.home-help .faq-contact-action>div:first-child:after{background-image:url('assets/winter-1-mobile.webp');background-position:58% 55%}
+.territory-help .faq-contact-action>div:first-child:after{background-image:url('assets/complex-tropical-banner.webp');background-position:58% 60%}
+#faq .faq-contact-action>div:first-child:after{background-image:url('assets/winter-2-mobile.webp');background-position:60% 50%}
 .help-contact-section .faq-contact-action h3,
 #faq .faq-contact-action h3{font-size:27px;line-height:1.2;letter-spacing:-.6px;max-width:320px;color:#18334b;text-wrap:balance}
 .help-contact-section .faq-contact-action p,
@@ -1331,9 +1331,9 @@ footer.site-footer{margin-top:16px;padding:56px 0 24px;background:#102338}
 #faq .faq-contact-action>div:first-child{background:#fff}
 .help-contact-section .faq-contact-action>div:first-child:after,
 #faq .faq-contact-action>div:first-child:after{inset:-3px;opacity:1;background-size:cover;mask-image:linear-gradient(90deg,#000 0%,#000 78%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 78%,transparent 100%)}
-.home-help .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.4)),url('assets/winter-1.webp');background-position:center 58%}
-.territory-help .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.86),rgba(9,27,43,.4)),url('assets/complex-tropical-poster.webp');background-position:center 60%}
-#faq .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.4)),url('assets/winter-2.webp');background-position:center 55%}
+.home-help .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.4)),url('assets/winter-1-mobile.webp');background-position:center 58%}
+.territory-help .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.86),rgba(9,27,43,.4)),url('assets/complex-tropical-banner.webp');background-position:center 60%}
+#faq .faq-contact-action>div:first-child:after{background-image:linear-gradient(90deg,rgba(9,27,43,.88),rgba(9,27,43,.4)),url('assets/winter-2-mobile.webp');background-position:center 55%}
 .help-contact-section .faq-contact-action>div:first-child:before,
 #faq .faq-contact-action>div:first-child:before{content:"";position:absolute;z-index:0;top:0;bottom:0;right:0;width:18%;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);mask-image:linear-gradient(90deg,transparent,#000);-webkit-mask-image:linear-gradient(90deg,transparent,#000);pointer-events:none}
 .help-contact-section .faq-contact-action h3,

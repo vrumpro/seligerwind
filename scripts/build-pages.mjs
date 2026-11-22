@@ -11,7 +11,7 @@ const source=(await Promise.all(files.filter(f=>/\.(html|css|js)$/.test(f)).map(
 const videoFiles=new Set([...source.matchAll(/assets\/([\w-]+\.mp4)/g)].map(m=>m[1]));
 await cp('assets','dist/assets',{recursive:true,filter:path=>{
  const name=path.replaceAll('\\','/').split('/').pop();
- if(name.endsWith('.jpg'))return false;
+ if(name.endsWith('.jpg'))return source.includes('assets/'+name);
  if(name.endsWith('.mp4'))return videoFiles.has(name);
  return !/^logo-(selected|modern|variant-)/.test(name);
 }});
