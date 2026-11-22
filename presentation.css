@@ -58,3 +58,4 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 .important-sources a{color:#6b5a3a;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:900px){.important-panel{padding:26px}.important-grid{grid-template-columns:1fr;gap:24px}}
 @media(max-width:600px){.presentation-nav{flex-wrap:wrap;justify-content:flex-start;gap:0 16px}.findings article{padding:18px}.important-panel{padding:22px 18px;border-radius:12px}.important-heading>p{font-size:14px}.important-grid{margin-top:24px}.important-sources{gap:12px}.closing-grid article{padding-left:16px}}
+@media(min-width:901px){#hero-desktop{width:min(100%,1228px,calc((100svh - 330px)*1.6));margin-inline:auto}#hero-desktop .reveal{max-height:none}}
