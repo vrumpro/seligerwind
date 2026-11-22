@@ -1512,8 +1512,8 @@ footer.site-footer{margin-top:16px;padding:56px 0 24px;background:#102338}
  header:not(.is-scrolled){background:transparent;border-bottom-color:transparent}
  header:not(.is-scrolled) .brand.brand-original img{filter:brightness(0) invert(1)}
  header:not(.is-scrolled) .header-contact>.phone,header:not(.is-scrolled) .mobile-menu-toggle{color:#fff}
- .hero{min-height:570px!important;min-height:max(570px,72svh)!important;padding-top:64px!important}
- .hero-intro{padding:70px 16px 100px!important}
+ .hero{min-height:500px!important;padding-top:64px!important}
+ .hero-intro{padding:52px 16px 76px!important}
  #search.search-wrap{margin:-52px 0 20px!important;z-index:12}
  .mobile-bottom-nav a,.mobile-bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:50px;padding:0 2px;border:0;border-radius:12px;background:transparent;text-decoration:none;color:#708094;font:inherit;font-size:10px;line-height:1.3;text-align:center}
  .mobile-bottom-nav button.is-active{color:var(--blue);background:#edf4ff}
