@@ -69,6 +69,10 @@ if(location.hostname==='127.0.0.1'||location.hostname==='localhost'){
  checkPreview();setInterval(checkPreview,2500);
 }
 const slideshow=document.querySelector('.hero-slideshow');const slides=[...slideshow.querySelectorAll('.hero-slide')];const motion=matchMedia('(prefers-reduced-motion: reduce)');let slideIndex=0,slideTimer=null,heroInView=true;
+function loadRemainingHeroPhotos(){
+ for(const slide of slides.slice(1)){if(slide.dataset.src){slide.srcset=slide.dataset.srcset;slide.src=slide.dataset.src;delete slide.dataset.src;delete slide.dataset.srcset}}
+}
+slides[0].decode().catch(()=>{}).then(()=>setTimeout(loadRemainingHeroPhotos,1800));
 function nextSlide(){if(slideshow.classList.contains('is-scrolling'))return;const nextIndex=(slideIndex+1)%slides.length,next=slides[nextIndex];if(!next.complete||!next.naturalWidth)return;const previous=slides[slideIndex];next.classList.remove('is-moving');void next.offsetWidth;next.classList.add('is-moving','is-visible');previous.classList.remove('is-visible');setTimeout(()=>{if(!previous.classList.contains('is-visible'))previous.classList.remove('is-moving')},1400);slideIndex=nextIndex}
 function syncSlideshow(){clearInterval(slideTimer);slideTimer=null;const paused=motion.matches||!heroInView||document.hidden;slideshow.classList.toggle('is-paused',paused);if(!paused)slideTimer=setInterval(nextSlide,5000)}
 new IntersectionObserver(entries=>{heroInView=entries[0].isIntersecting;syncSlideshow()},{threshold:.05}).observe(document.querySelector('.hero'));document.addEventListener('visibilitychange',syncSlideshow);motion.addEventListener('change',syncSlideshow);syncSlideshow();
@@ -115,7 +119,7 @@ document.querySelector('#map-points').innerHTML=mapPlaces.map(p=>'<button type="
 mapLegend.innerHTML=mapPlaces.map(p=>'<button type="button" data-map-place="'+p.id+'" aria-expanded="false" aria-controls="map-preview">'+p.name+'</button>').join('');
 function closeMapPreview(){clearTimeout(mapHideTimer);mapPreview.hidden=true;activeMapPlace=null;document.querySelectorAll('[data-map-place]').forEach(b=>{b.classList.remove('is-active');b.setAttribute('aria-expanded','false')})}
 function placeMapPreview(){if(!activeMapPlace||innerWidth<=760)return;const w=mapRoot.clientWidth,h=mapRoot.clientHeight;const x=activeMapPlace.x/100*w,y=activeMapPlace.y/100*h;const pw=mapPreview.offsetWidth,ph=mapPreview.offsetHeight;mapPreview.style.left=Math.max(8,Math.min(w-pw-8,x-pw/2))+'px';mapPreview.style.top=Math.max(8,Math.min(h-ph-8,y>ph+24?y-ph-24:y+24))+'px'}
-function openMapPreview(p){clearTimeout(mapHideTimer);if(activeMapPlace?.id!==p.id){activeMapPlace=p;mapPreview.innerHTML='<img src="'+(p.room?catalog.find(room=>room.id===p.room).photos[0]:'assets/map-preview-'+p.photo+'.jpg')+'" alt="'+p.name+'" width="280" height="160"><div class="map-preview-copy"><strong>'+p.name+'</strong>'+(p.room?'<button type="button" class="text-button" data-detail="'+p.room+'">Посмотреть дом '+icon('arrow-right')+'</button>':p.href?'<a class="text-button" href="'+p.href+'" target="_blank" rel="noopener">Подробнее '+icon('arrow-right')+'</a>':'<span>На территории комплекса</span>')+'</div>';mapPreview.querySelector('[data-detail]')?.addEventListener('click',()=>closeMapPreview());mapPreview.querySelector('img').onload=placeMapPreview}
+function openMapPreview(p){clearTimeout(mapHideTimer);if(activeMapPlace?.id!==p.id){activeMapPlace=p;mapPreview.innerHTML='<img src="'+(p.room?catalog.find(room=>room.id===p.room).photos[0]:'assets/map-preview-'+p.photo+'.webp')+'" alt="'+p.name+'" width="280" height="160"><div class="map-preview-copy"><strong>'+p.name+'</strong>'+(p.room?'<button type="button" class="text-button" data-detail="'+p.room+'">Посмотреть дом '+icon('arrow-right')+'</button>':p.href?'<a class="text-button" href="'+p.href+'" target="_blank" rel="noopener">Подробнее '+icon('arrow-right')+'</a>':'<span>На территории комплекса</span>')+'</div>';mapPreview.querySelector('[data-detail]')?.addEventListener('click',()=>closeMapPreview());mapPreview.querySelector('img').onload=placeMapPreview}
  mapPreview.hidden=false;document.querySelectorAll('[data-map-place]').forEach(b=>{const active=b.dataset.mapPlace===p.id;b.classList.toggle('is-active',active);b.setAttribute('aria-expanded',String(active))});placeMapPreview()}
 for(const button of document.querySelectorAll('[data-map-place]')){
  const p=mapPlaces.find(p=>p.id===button.dataset.mapPlace);let touch=false;
@@ -149,8 +153,8 @@ scheduleSearchDock();
 new ResizeObserver(()=>{document.querySelector('#houses').style.setProperty('--search-height',searchSurface.offsetHeight+'px')}).observe(searchSurface);
 document.querySelectorAll('[data-leisure-icon]').forEach(el=>el.innerHTML=icon(el.dataset.leisureIcon));
 const experiencePhotos={
- sauna:Array.from({length:12},(_,i)=>'assets/sauna-slide-'+(i+1)+'.jpg'),
- playground:Array.from({length:8},(_,i)=>'assets/playground-slide-'+(i+1)+'.jpg')
+ sauna:Array.from({length:12},(_,i)=>'assets/sauna-slide-'+(i+1)+'.webp'),
+ playground:Array.from({length:8},(_,i)=>'assets/playground-slide-'+(i+1)+'.webp')
 };
 document.querySelectorAll('[data-leisure-gallery]').forEach(gallery=>{
  const sources=experiencePhotos[gallery.dataset.leisureGallery],stage=gallery.querySelector('.experience-stage'),previews=gallery.querySelector('.experience-previews');
@@ -202,9 +206,9 @@ const complexPlayer=document.querySelector('#complex-player'),complexFullFilm=do
 complexPlayerClose.innerHTML=icon('x');
 let complexInView=false,complexNativeFullscreen=false,complexVideoIndex=0,complexUserPaused=false,complexManualPlay=false;
 const complexVideos=[
- {src:'assets/complex-video-sound.mp4',poster:'assets/complex-overview-poster.jpg',title:'Дома в сосновом лесу у озера Волго',description:'Seliger Wind — комплекс на южном берегу озера Волго в Тверской области. Дома и виллы стоят среди сосен: можно приехать вдвоём, с детьми или компанией. На территории есть баня с горячим чаном и детская площадка. Для проживания доступны барнхаусы и Tropical Villa с панорамными окнами и собственными террасами, а в тёплый сезон — сафари-тенты.'},
- {src:'assets/complex-tropical.mp4',poster:'assets/complex-tropical-poster.jpg',title:'Tropical Villa — виллы в тропическом стиле',description:'Tropical Villa — отдельные виллы с панорамным остеклением, просторными террасами и собственными зонами отдыха. В интерьерах использованы дерево и натуральные фактуры ротанга, тика и бамбука. Большие окна открывают вид на сосны, а терраса продолжает жилое пространство на улице. В видео можно рассмотреть обстановку внутри и территорию рядом с виллами.'},
- {src:'assets/complex-playground.mp4',poster:'assets/complex-playground-poster.jpg',title:'Детская площадка на территории комплекса',description:'Качели, горки и песочница среди сосен. В ролике — игровая площадка и занятия для детей на свежем воздухе.'}
+ {src:'assets/complex-video-sound-optimized.mp4',poster:'assets/complex-overview-poster.webp',title:'Дома в сосновом лесу у озера Волго',description:'Seliger Wind — комплекс на южном берегу озера Волго в Тверской области. Дома и виллы стоят среди сосен: можно приехать вдвоём, с детьми или компанией. На территории есть баня с горячим чаном и детская площадка. Для проживания доступны барнхаусы и Tropical Villa с панорамными окнами и собственными террасами, а в тёплый сезон — сафари-тенты.'},
+ {src:'assets/complex-tropical.mp4',poster:'assets/complex-tropical-poster.webp',title:'Tropical Villa — виллы в тропическом стиле',description:'Tropical Villa — отдельные виллы с панорамным остеклением, просторными террасами и собственными зонами отдыха. В интерьерах использованы дерево и натуральные фактуры ротанга, тика и бамбука. Большие окна открывают вид на сосны, а терраса продолжает жилое пространство на улице. В видео можно рассмотреть обстановку внутри и территорию рядом с виллами.'},
+ {src:'assets/complex-playground.mp4',poster:'assets/complex-playground-poster.webp',title:'Детская площадка на территории комплекса',description:'Качели, горки и песочница среди сосен. В ролике — игровая площадка и занятия для детей на свежем воздухе.'}
 ];
 const complexVideoCards=[...document.querySelectorAll('[data-complex-video]')];
 function selectComplexVideo(index){
