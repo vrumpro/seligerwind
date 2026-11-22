@@ -7,4 +7,3 @@
 
 
 .closing-result{margin-top:40px;padding:30px;background:#f1f6ff;border-radius:16px}.closing-result>p{max-width:1100px;font-size:16px;line-height:1.8;margin-top:14px;color:var(--muted)}.closing-result>.note{font-size:12px;max-width:950px}@media(max-width:600px){.closing-result{padding:22px}.closing-result>p{font-size:14px}.closing-result>.note{font-size:12px}}
-#hero-desktop .full-page-scroll{height:1100px;max-height:125svh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}#hero-desktop .reveal{aspect-ratio:auto;background:#fff}#hero-desktop .reveal>img{height:auto;object-fit:contain;object-position:top}#hero-desktop .reveal-line>span{position:sticky;top:42vh;transform:translateX(-50%);margin-top:180px}#hero-desktop .reveal input{touch-action:pan-y}@media(max-width:600px){#hero-desktop .full-page-scroll{height:650px;max-height:90svh}}
