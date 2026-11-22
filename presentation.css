@@ -36,3 +36,4 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 .screenshot-body img{display:block;max-width:100%;width:auto;height:auto;margin:auto}
 @media(max-width:900px){.presentation-nav{gap:14px;font-size:12px}.presentation-header>a>span{display:none}}
 @media(max-width:600px){.presentation-header{height:auto;min-height:96px;align-items:flex-start;flex-direction:column;justify-content:center;gap:4px;padding:12px 18px}.presentation-nav{width:100%;justify-content:space-between;gap:8px}.comparison-pair.desktop{grid-template-columns:1fr;gap:22px}.findings p{font-size:14px}.screenshot-toolbar{padding:10px;gap:10px}.screenshot-toolbar span{font-size:12px}.screenshot-body{padding:6px}.screenshot-dialog{width:96vw}}
+#hero-desktop{width:min(100%,1228px);margin-inline:auto}#hero-desktop .reveal{max-height:767px}#hero-mobile .phone-frame{max-height:800px}.screenshot-body img{max-height:none}
