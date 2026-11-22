@@ -47,11 +47,7 @@ document.addEventListener('select-alternative-dates',e=>{
  arrival.value=e.detail.arrival;departure.value=e.detail.departure;departure.min=addDays(arrival.value,1);
  childrenOpen(false);invalidate();
 });
-function openBooking(room='',currency=selectedCurrency()){
- const s=state(),error=validate(s);if(error){$('#form-error').textContent=error;$('#search').scrollIntoView();const missing=ages.querySelector('select:invalid');if(missing)childrenOpen(true);(missing||arrival).focus({preventScroll:true});return}
- const item=catalog.find(r=>r.id===room);if(item?.capacity&&s.adults+s.children.length>item.capacity){$('#form-error').textContent=`В ${item.name} указано до ${item.capacity} гостей. Уменьшите состав гостей или найдите другое проживание.`;$('#search').scrollIntoView();adults.focus({preventScroll:true});return}
- childrenOpen(false);const kind=$('#type').value;const group=kind==='all'?'':catalog.filter(r=>(r.name.includes('Safari')?'tent':'house')===kind).map(r=>r.id).join(',');const target=new URL(bookingUrl(s,room||group));target.searchParams.set('currency',currency);const url=target.href;remember();$('#booking-title').textContent=item?item.name:kind==='house'?'Дома и виллы':kind==='tent'?'Глэмпинг':'Свободное проживание';const date=v=>v.split('-').reverse().join('.');$('#booking-summary').textContent=`${date(s.arrival)} — ${date(s.departure)} · взрослых: ${s.adults} · детей: ${s.children.length}`;$('#external-booking').href=url;$('#booking-frame').src=url;$('#booking').hidden=false;$('#booking-title').focus({preventScroll:true});$('#booking').scrollIntoView();
-}
+function openBooking(){showDemoNotice()}
 $('#booking-form').addEventListener('submit',e=>{e.preventDefault();searchHouses()});$('#close-booking').onclick=()=>{$('#booking').hidden=true;$('#booking-frame').removeAttribute('src');arrival.focus();$('#search').scrollIntoView()};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function meta(r){return `${r.area} м² · ${r.capacity?'до '+r.capacity+' гостей':'вместимость уточняется при поиске'}`}
@@ -62,7 +58,7 @@ function render(){
 }function syncType(){resetSearch();syncFields();document.querySelectorAll('[data-search-type]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.searchType===$('#type').value)));expanded=false;if(!$('#booking').hidden){$('#booking').hidden=true;$('#booking-frame').removeAttribute('src')}render()}
 $('#type').onchange=syncType;document.querySelectorAll('[data-search-type]').forEach(b=>b.onclick=()=>{$('#type').value=b.dataset.searchType;syncType()});
 const dialog=$('#details');dialog.setAttribute('aria-labelledby','detail-title');
-function details(id){const r=catalog.find(r=>r.id===id);if(!r)return;selected=id;$('#detail-title').textContent=r.name;$('#detail-meta').textContent=meta(r);$('#detail-photos').innerHTML=r.photos.map((p,i)=>`<a href="${esc(p)}" target="_blank" rel="noopener" aria-label="Открыть фото ${i+1} ${esc(r.name)}"><img src="${esc(p)}" alt="${esc(r.name)}, фото ${i+1}" width="700" height="440"></a>`).join('');$('#detail-description').replaceChildren();for(const text of r.description.split('\n').filter(Boolean)){const p=document.createElement('p');p.textContent=text;$('#detail-description').append(p)}dialog.showModal();dialog.scrollTop=0}
+function details(id){const room=catalog.find(r=>r.id===id);if(room)openPhotoGallery(room.photos,0,room.name)}
 $('.dialog-close').onclick=()=>dialog.close();$('#detail-book').onclick=()=>{dialog.close();openBooking(selected)};document.addEventListener('click',e=>{const d=e.target.closest('[data-detail]'),b=e.target.closest('[data-book]');if(d)details(d.dataset.detail);else if(b)openBooking(b.dataset.book)});syncType();enhanceFields();
 // Refresh only when served page sources change; ignore documentation and temporary files.
 if(location.hostname==='127.0.0.1'||location.hostname==='localhost'){
@@ -399,3 +395,62 @@ document.querySelectorAll('[data-booking-cta]').forEach(link=>link.addEventListe
  window.addEventListener('resize',()=>{if(innerWidth>760&&menu.open)menu.close();update()});
  update();
 })();
+// Demo handoff and an independent full-screen photo viewer.
+function showDemoNotice(){
+ closePicker();childrenOpen(false);
+ let demo=document.querySelector('#demo-notice');
+ if(!demo){
+  demo=document.createElement('dialog');demo.id='demo-notice';demo.className='demo-notice';demo.setAttribute('aria-labelledby','demo-title');
+  demo.innerHTML='<button class="demo-close" type="button" aria-label="Закрыть">'+icon('x')+'</button><span class="demo-symbol">'+icon('house')+'</span><h2 id="demo-title">Это демоверсия сайта</h2><p>Бронирование и некоторые другие функции пока недоступны.</p><button class="button demo-done" type="button">Понятно</button>';
+  document.body.append(demo);
+  demo.querySelectorAll('button').forEach(b=>b.onclick=()=>demo.close());
+  demo.addEventListener('click',e=>{if(e.target===demo){const r=demo.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)demo.close()}});
+  demo.addEventListener('close',()=>document.body.classList.remove('photo-modal-open'));
+ }
+ document.body.classList.add('photo-modal-open');demo.showModal();
+}
+let photoViewer,photoSources=[],photoPosition=0,photoTitle='',photoOrigin;
+function paintPhoto(){
+ const img=photoViewer.querySelector('.photo-viewer-image');
+ img.src=photoSources[photoPosition];img.alt=photoTitle+' — фото '+(photoPosition+1);
+ photoViewer.querySelector('.photo-viewer-count').textContent=(photoPosition+1)+' / '+photoSources.length;
+ photoViewer.querySelectorAll('[data-photo-move]').forEach(b=>b.hidden=photoSources.length<2);
+}
+function movePhoto(step){photoPosition=(photoPosition+step+photoSources.length)%photoSources.length;paintPhoto()}
+function openPhotoGallery(sources,index=0,title='Seliger Wind'){
+ if(!sources.length)return;
+ closePicker();childrenOpen(false);
+ if(!photoViewer){
+  photoViewer=document.createElement('dialog');photoViewer.className='photo-viewer';photoViewer.setAttribute('aria-label','Фотогалерея');
+  photoViewer.innerHTML='<div class="photo-viewer-heading"><span></span><button type="button" class="photo-viewer-close" aria-label="Закрыть галерею">'+icon('x')+'</button></div><button type="button" class="photo-viewer-prev" data-photo-move="-1" aria-label="Предыдущее фото">'+icon('chevron-left')+'</button><div class="photo-viewer-stage"><img class="photo-viewer-image" alt="" draggable="false"></div><button type="button" class="photo-viewer-next" data-photo-move="1" aria-label="Следующее фото">'+icon('chevron-right')+'</button><div class="photo-viewer-count" aria-live="polite"></div>';
+  document.body.append(photoViewer);
+  photoViewer.querySelector('.photo-viewer-close').onclick=()=>photoViewer.close();
+  photoViewer.querySelectorAll('[data-photo-move]').forEach(b=>b.onclick=()=>movePhoto(Number(b.dataset.photoMove)));
+  photoViewer.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();movePhoto(e.key==='ArrowLeft'?-1:1)}});
+  let swipe;
+  photoViewer.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')swipe={x:e.clientX,y:e.clientY}});
+  photoViewer.addEventListener('pointerup',e=>{if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy))movePhoto(dx<0?1:-1)});
+  photoViewer.addEventListener('pointercancel',()=>swipe=null);
+  photoViewer.addEventListener('close',()=>{document.body.classList.remove('photo-modal-open');photoOrigin?.focus({preventScroll:true})});
+ }
+ photoSources=sources;photoPosition=Math.max(0,Math.min(index,sources.length-1));photoTitle=title;photoOrigin=document.activeElement;
+ photoViewer.querySelector('.photo-viewer-heading>span').textContent=title;paintPhoto();
+ document.body.classList.add('photo-modal-open');if(!photoViewer.open)photoViewer.showModal();
+}
+document.addEventListener('click',e=>{
+ const reserve=e.target.closest('[data-reserve],[data-book]');
+ if(reserve){e.preventDefault();e.stopImmediatePropagation();showDemoNotice();return}
+ const roomButton=e.target.closest('.gallery-main');
+ if(roomButton){
+  const room=catalog.find(r=>r.id===roomButton.dataset.detail);
+  if(room){e.preventDefault();e.stopImmediatePropagation();const current=roomButton.querySelector('img').getAttribute('src');openPhotoGallery(room.photos,Math.max(0,room.photos.findIndex(src=>new URL(src,location.href).href===new URL(current,location.href).href)),room.name)}
+  return;
+ }
+ const photoLink=e.target.closest('a[href]'),thumb=e.target.closest('[data-experience-slide]');
+ if(!(photoLink&&/\.(jpe?g|png|webp)(\?.*)?$/i.test(photoLink.getAttribute('href')))&&!thumb)return;
+ const source=thumb?.querySelector('img').getAttribute('src')||photoLink.getAttribute('href');
+ const group=(thumb||photoLink).closest('[data-leisure-gallery]'),section=(thumb||photoLink).closest('section');
+ const sources=group?experiencePhotos[group.dataset.leisureGallery]:[source];
+ const absolute=new URL(source,location.href).href,index=sources.findIndex(src=>new URL(src,location.href).href===absolute);
+ e.preventDefault();e.stopImmediatePropagation();openPhotoGallery(sources,Math.max(0,index),section?.querySelector('h2')?.textContent||'Seliger Wind');
+},true);
