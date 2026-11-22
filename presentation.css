@@ -37,3 +37,24 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 @media(max-width:900px){.presentation-nav{gap:14px;font-size:12px}.presentation-header>a>span{display:none}}
 @media(max-width:600px){.presentation-header{height:auto;min-height:96px;align-items:flex-start;flex-direction:column;justify-content:center;gap:4px;padding:12px 18px}.presentation-nav{width:100%;justify-content:space-between;gap:8px}.comparison-pair.desktop{grid-template-columns:1fr;gap:22px}.findings p{font-size:14px}.screenshot-toolbar{padding:10px;gap:10px}.screenshot-toolbar span{font-size:12px}.screenshot-body{padding:6px}.screenshot-dialog{width:96vw}}
 #hero-desktop{width:min(100%,1228px);margin-inline:auto}#hero-desktop .reveal{max-height:767px}#hero-mobile .phone-frame{max-height:800px}.screenshot-body img{max-height:none}
+/* Restrained presentation accents */
+.presentation-header{border-bottom-color:#e8edf2}
+.screen-heading h2::before{content:"";display:block;width:32px;height:3px;border-radius:2px;background:#0768ff;margin-bottom:16px}
+.device-tabs{background:#f0f3f7;border:1px solid #e4eaf0}
+.browser-frame{border-color:#dbe3eb;box-shadow:0 8px 28px #18334d06}
+.findings article{border:0;background:#f6f8fa;padding:22px;border-radius:12px}
+.findings article:nth-child(2){background:#f1f6fc}
+.findings h3{color:#52687c}
+.closing-grid article{padding-left:20px;border-left:2px solid #d9e5f3}
+.important-panel{border:1px solid #eadfc9;border-radius:18px;background:#fffdf8;padding:36px}
+.important-label{display:inline-block;color:#855c19;background:#f4e9cf;border-radius:5px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.08em;margin-bottom:18px}
+.important-heading h2{max-width:1000px}
+.important-heading>p{max-width:1000px;margin-top:18px;color:var(--muted);font-size:16px;line-height:1.75}
+.important-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:32px}
+.important-grid p,.important-fine p{font-size:14px;line-height:1.8;color:#4e6172;margin-top:12px}
+.important-fine{border-top:1px solid #eadfc9;margin-top:30px;padding-top:24px;max-width:1200px}
+.important-fine strong{color:#634713;white-space:nowrap}
+.important-sources{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:24px;font-size:12px;color:var(--muted)}
+.important-sources a{color:#6b5a3a;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:900px){.important-panel{padding:26px}.important-grid{grid-template-columns:1fr;gap:24px}}
+@media(max-width:600px){.presentation-nav{flex-wrap:wrap;justify-content:flex-start;gap:0 16px}.findings article{padding:18px}.important-panel{padding:22px 18px;border-radius:12px}.important-heading>p{font-size:14px}.important-grid{margin-top:24px}.important-sources{gap:12px}.closing-grid article{padding-left:16px}}
