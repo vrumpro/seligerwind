@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Seliger Wind — сравнение сайта до и после</title><link rel="stylesheet" href="presentation.css?v=journey1"></head><body>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Seliger Wind — сравнение сайта до и после</title><link rel="stylesheet" href="presentation.css?v=gallery2"></head><body>
 <header class="presentation-header"><a href="#start">SELIGER WIND<span>Сравнение сайта до и после</span></a><nav class="presentation-nav" aria-label="Разделы презентации"><a href="#parameters">Подбор дома</a><a href="#complex">О комплексе</a><a href="#actions">Связь</a><a href="#speed">Скорость</a><a href="#admin">Развитие</a><a href="#important">Важно</a><a href="#conclusion">Вывод</a></nav></header>
 <main>
 <section class="screen first-screen" id="start">
@@ -54,30 +54,60 @@ function simplifyCaptions(){
 }
 simplifyCaptions();
 const gallery=document.createElement('dialog');
-gallery.className='screenshot-dialog';
-gallery.setAttribute('aria-label','Увеличенный скриншот');
-gallery.innerHTML='<div class="screenshot-toolbar"><span id="screenshot-title"></span><button type="button" aria-label="Закрыть скриншот">Закрыть ×</button></div><div class="screenshot-body"><img alt=""></div>';
+gallery.className='presentation-viewer';
+gallery.setAttribute('aria-label','Просмотр скриншотов');
+const galleryIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+({close:'<path d="m6 6 12 12M18 6 6 18"/>',prev:'<path d="m15 18-6-6 6-6"/>',next:'<path d="m9 18 6-6-6-6"/>'}[name])+'</svg>';
+gallery.innerHTML='<header class="viewer-heading"><span id="screenshot-title"></span><button class="viewer-close" aria-label="Закрыть галерею">'+galleryIcon('close')+'</button></header><button class="viewer-prev" aria-label="Предыдущий скриншот">'+galleryIcon('prev')+'</button><div class="viewer-stage" tabindex="-1"><img alt="" draggable="false"></div><button class="viewer-next" aria-label="Следующий скриншот">'+galleryIcon('next')+'</button><footer class="viewer-footer"><div class="viewer-versions" aria-label="Версия сайта"></div><span class="viewer-count" aria-live="polite"></span></footer>';
 document.body.append(gallery);
-let opener=null,previousOverflow='';
-function closeScreenshot(){gallery.close()}
-gallery.querySelector('button').onclick=closeScreenshot;
-gallery.addEventListener('click',e=>{if(e.target===gallery)closeScreenshot()});
-gallery.addEventListener('close',()=>{document.body.style.overflow=previousOverflow;opener?.focus({preventScroll:true})});
+let opener=null,previousOverflow='',shots=[],position=0,galleryTitle='',animationId=0;
+function paintScreenshot(){
+ const shot=shots[position],img=gallery.querySelector('img');
+ img.src=shot.src;img.alt=shot.alt;
+ gallery.querySelector('#screenshot-title').textContent=galleryTitle;
+ gallery.querySelector('.viewer-count').textContent=(position+1)+' / '+shots.length;
+ gallery.querySelectorAll('.viewer-prev,.viewer-next').forEach(b=>b.hidden=shots.length<2);
+ const tabs=gallery.querySelector('.viewer-versions');tabs.replaceChildren();
+ shots.forEach((item,i)=>{const b=document.createElement('button');b.textContent=item.label;b.className=i===position?'active':'';b.setAttribute('aria-pressed',String(i===position));b.onclick=()=>moveScreenshot(i-position);tabs.append(b)});
+}
+async function moveScreenshot(step){
+ if(!step||shots.length<2)return;
+ const token=++animationId,nextPosition=(position+step+shots.length)%shots.length;
+ const preload=new Image();preload.src=shots[nextPosition].src;try{await preload.decode()}catch{}
+ if(token!==animationId||!gallery.open)return;
+ position=nextPosition;paintScreenshot();
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)gallery.querySelector('img').animate([{opacity:0,transform:'translateX('+(step>0?36:-36)+'px)'},{opacity:1,transform:'translateX(0)'}],{duration:220,easing:'ease-out'});
+}
+function openScreenshots(items,index,title,button){
+ animationId++;shots=items;position=index;galleryTitle=title;opener=button;
+ previousOverflow=document.body.style.overflow;paintScreenshot();
+ document.body.style.overflow='hidden';gallery.showModal();gallery.querySelector('.viewer-stage').focus();
+}
+gallery.querySelector('.viewer-close').onclick=()=>gallery.close();
+gallery.querySelector('.viewer-prev').onclick=()=>moveScreenshot(-1);
+gallery.querySelector('.viewer-next').onclick=()=>moveScreenshot(1);
+gallery.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();moveScreenshot(e.key==='ArrowLeft'?-1:1)}});
+gallery.addEventListener('close',()=>{animationId++;document.body.style.overflow=previousOverflow;opener?.focus({preventScroll:true})});
+let swipe;
+gallery.querySelector('.viewer-stage').addEventListener('pointerdown',e=>{if(e.pointerType==='touch')swipe={x:e.clientX,y:e.clientY}});
+gallery.querySelector('.viewer-stage').addEventListener('pointerup',e=>{if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))moveScreenshot(dx<0?1:-1)});
+gallery.querySelector('.viewer-stage').addEventListener('pointercancel',()=>swipe=null);
 function prepareImages(){
  simplifyCaptions();
  document.querySelectorAll('.comparison-pair img,.quick-phone img').forEach(img=>{
   if(img.parentElement.tagName==='BUTTON')return;
   const button=document.createElement('button');button.type='button';button.className='screenshot-open';
-  button.setAttribute('aria-label','Увеличить: '+img.alt);
-  img.before(button);button.append(img);
-  button.onclick=()=>{opener=button;previousOverflow=document.body.style.overflow;
-   gallery.querySelector('img').src=img.src;gallery.querySelector('img').alt=img.alt;
-   const section=img.closest('section');const version=img.closest('figure')?.querySelector('.version-label')?.textContent;
-   gallery.querySelector('#screenshot-title').textContent=(section?.querySelector('h2,h1')?.textContent||'Скриншот')+(version?' — '+version:'');
-   gallery.showModal();document.body.style.overflow='hidden';gallery.querySelector('.screenshot-body').scrollTop=0;
+  button.setAttribute('aria-label','Открыть галерею: '+img.alt);img.before(button);button.append(img);
+  button.onclick=()=>{
+   const section=img.closest('section'),pair=img.closest('.comparison-pair');
+   const images=pair?[...pair.querySelectorAll('img')]:[img];
+   const items=images.map(item=>({src:item.src,alt:item.alt,label:item.closest('figure')?.querySelector('.version-label')?.textContent||(images.length===1?'Скриншот':'Фото')}));
+   openScreenshots(items,images.indexOf(img),section?.querySelector('h2,h1')?.textContent||'Скриншоты',button);
   };
  });
 }
 prepareImages();
 document.querySelectorAll('.comparison-section [data-device]').forEach(b=>b.addEventListener('click',prepareImages));
+const heroOpen=document.createElement('button');heroOpen.type='button';heroOpen.className='hero-gallery-open';heroOpen.textContent='Открыть до / после на весь экран';
+document.querySelector('#hero-desktop .browser-top').append(heroOpen);
+heroOpen.onclick=()=>openScreenshots(['before','after'].map((v,i)=>({src:'assets/part-hero-'+v+'-desktop.webp?v=copy2',alt:i?'Новый первый экран':'Старый первый экран',label:i?'После':'До'})),0,'Первый экран',heroOpen);
 </script></body></html>
