@@ -5,6 +5,7 @@ import {catalog as fullCatalog} from './catalog.js';
 // Winter selection: safari tents temporarily excluded; source records retained.
 const catalog=fullCatalog.filter(room=>!room.name.includes('Safari'));
 import {today,addDays,validate,bookingUrl} from './booking.js';
+import {snapshot} from './booking-snapshot.js';
 const $=s=>document.querySelector(s);const arrival=$('#arrival'),departure=$('#departure'),adults=$('#adults'),count=$('#children-count'),ages=$('#ages');
 const option=(value,label)=>new Option(label,value);
 for(let i=1;i<=16;i++)adults.add(option(i,i));
@@ -12,7 +13,7 @@ let saved={};try{saved=JSON.parse(sessionStorage.getItem('seliger-search')||'{}'
 const shared=new URLSearchParams(location.search);restoreBookingUi(shared);if(['all','house'].includes(shared.get('type')))document.querySelector('#type').value=shared.get('type');
 if(shared.has('arrival')){try{const proposal={arrival:shared.get('arrival'),departure:shared.get('departure'),adults:Number(shared.get('adults')),children:JSON.parse(shared.get('children')||'[]')};if(!validate(proposal))saved=proposal}catch{}}
 const bedrooms=document.querySelector('#bedrooms');bedrooms.value=['1','2','3'].includes(shared.get('bedrooms')||saved.bedrooms)?(shared.get('bedrooms')||saved.bedrooms):'any';
-const base=today();arrival.min=base;arrival.value=saved.arrival>=base?saved.arrival:base;departure.value=saved.departure>arrival.value?saved.departure:addDays(arrival.value,2);departure.min=addDays(arrival.value,1);adults.value=String(saved.adults||2);if(!adults.value)adults.value='2';count.value=String(Array.isArray(saved.children)?Math.min(saved.children.length,6):0);
+const base=today();arrival.min=base;arrival.value=saved.arrival>=base?saved.arrival:(snapshot.arrival>=base?snapshot.arrival:base);departure.value=saved.departure>arrival.value?saved.departure:addDays(arrival.value,2);departure.min=addDays(arrival.value,1);adults.value=String(saved.adults||2);if(!adults.value)adults.value='2';count.value=String(Array.isArray(saved.children)?Math.min(saved.children.length,6):0);
 function ageLabel(n){return n===0?'До 1 года':n+' '+(n%10===1&&n!==11?'год':n%10>=2&&n%10<=4&&(n<12||n>14)?'года':'лет')}
 function updateChildrenSummary(){const n=Number(count.value);$('#children-summary').textContent=n?n+' '+(n===1?'ребёнок':n<5?'ребёнка':'детей'):'Без детей';$('#add-child').disabled=n>=6;$('#children-error').textContent=''}
 function makeAges(previous=[]){ages.replaceChildren();for(let i=0;i<Number(count.value);i++){const row=document.createElement('div');row.className='child-row';const label=document.createElement('label');label.textContent='Ребёнок '+(i+1);const select=document.createElement('select');select.required=true;select.add(option('','Возраст'));for(let n=0;n<18;n++)select.add(option(n,ageLabel(n)));select.value=previous[i]==null?'':String(previous[i]);label.append(select);const remove=document.createElement('button');remove.type='button';remove.className='remove-child';remove.innerHTML=icon('minus');remove.setAttribute('aria-label','Убрать ребёнка '+(i+1));remove.onclick=()=>{const current=state().children;current.splice(i,1);count.value=String(current.length);makeAges(current);invalidate();($('#ages select')||$('#add-child')).focus()};row.append(label,remove);ages.append(row)}updateChildrenSummary();enhanceFields(ages)}
@@ -483,7 +484,7 @@ function updatePhotoBooking(){
  const dates=s.arrival&&s.departure?date(s.arrival)+' — '+date(s.departure):'Даты не выбраны';
  footer.querySelector('.photo-booking-info').innerHTML='<strong>'+esc(room?.name||photoTitle)+'</strong><span>'+esc(dates+' · Взрослых: '+s.adults+(s.children.length?' · Детей: '+s.children.length:''))+'</span><small>'+esc(card?.querySelector('.meal-switch-option.is-selected>span')?.textContent||'Демонстрационная версия')+'</small>';
  const price=card?.querySelector('.rate-price strong')?.textContent,deposit=card?.querySelector('.rate-prepayment')?.textContent;
- footer.querySelector('.photo-booking-price').innerHTML=price?'<strong>'+esc(price)+'</strong><small>За весь период'+(deposit?' · '+esc(deposit):'')+'</small>':'<small>Стоимость и бронирование недоступны в демо</small>';
+ footer.querySelector('.photo-booking-price').innerHTML=price?'<strong>'+esc(price)+'</strong><small>24–26 ноября · 2 взрослых'+(deposit?' · '+esc(deposit):'')+'</small>':'<small>Стоимость и бронирование недоступны в демо</small>';
 }
 (function mobileRoute(){
  const old=document.querySelector('[data-mobile-destination="directions"]');

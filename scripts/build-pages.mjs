@@ -1,5 +1,5 @@
 import {mkdir,copyFile,cp,writeFile,readFile} from 'node:fs/promises';
-const files=['index.html','styles.css','app.js','booking.js','booking-ui.js','booking-icons.js','booking-snapshot.js','catalog.js','custom-fields.js','icons.js','liquid-glass.js','robots.txt','LUCIDE-LICENSE.txt'];
+const files=['index.html','presentation.html','presentation.css','styles.css','app.js','booking.js','booking-ui.js','booking-icons.js','booking-snapshot.js','catalog.js','custom-fields.js','icons.js','liquid-glass.js','robots.txt','LUCIDE-LICENSE.txt'];
 await mkdir('dist',{recursive:true});
 for(const file of files){
  if(file.endsWith('.css')){

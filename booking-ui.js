@@ -14,7 +14,7 @@ const money=value=>new Intl.NumberFormat('ru-RU',{style:'currency',currency,maxi
 const currencySymbol=code=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:code,currencyDisplay:'narrowSymbol'}).formatToParts(0).find(p=>p.type==='currency')?.value||code;
 const matchSnapshot=s=>s.arrival===snapshot.arrival&&s.departure===snapshot.departure&&s.adults===snapshot.adults&&s.children.length===0;
 // Owner-approved fictional availability for the local demo, not Bnovo data.
-const demoBusyRooms=new Set(['484265','484268']);
+const demoBusyRooms=new Set();
 const demoChosenDates=new Map(),demoDatePages=new Map();
 const dateText=value=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z')).replace(/\.$/,'');
 function demoSelection(id){const selected=demoChosenDates.get(id);return selected&&selected.arrival===context.state.arrival&&selected.departure===context.state.departure?selected:null}
@@ -24,7 +24,7 @@ function cardDatesHtml(room){
  const range=esc(dateText(context.state.arrival)+' — '+dateText(context.state.departure));
  const tooSmall=room.capacity&&context.state.adults+context.state.children.length>room.capacity;
  const busy=demoUnavailable(room);
- const text=tooSmall?range+' · недостаточно мест для гостей':busy?'На '+range+' мест нет':'Свободно на '+range;
+ const text=tooSmall?range+' · недостаточно мест для гостей':busy?'На '+range+' мест нет':'Выбранные даты: '+range;
  return '<div class="card-dates '+(busy||tooSmall?'is-unavailable':'is-available')+'">'+icon('calendar-days')+'<span>'+text+'</span></div>';
 }
 function cardAvailabilityRank(room){
@@ -37,7 +37,7 @@ function demoAlternatives(room){
  const base=snapshot.rates.find(r=>r.roomId===room.id&&r.planId==='612820')||snapshot.rates.find(r=>r.roomId===room.id);
  return [1,2,4,7,9,14].map((offset,i)=>{
   const arrival=addDays(start,offset),departure=addDays(arrival,nights),prices={};
-  for(const code of snapshot.currencies.map(c=>c.code)){const value=base?.prices[code];if(Number.isFinite(value))prices[code]=Math.round(value/2*nights*[1,.92,1.04,.96,1.08,.9][i])}
+  for(const code of snapshot.currencies.map(c=>c.code)){const value=base?.prices[code];if(Number.isFinite(value))prices[code]=Math.round(value)}
   return {arrival,departure,nights,prices};
  });
 }
@@ -52,16 +52,7 @@ function selectedNights(){
  if(!validDate(arrival)||!validDate(departure)||departure<=arrival)return null;
  return Math.round((Date.parse(departure)-Date.parse(arrival))/86400000);
 }
-function ratesFor(id){
- const demo=demoSelection(id),nights=selectedNights();
- const baseNights=Math.round((Date.parse(snapshot.departure)-Date.parse(snapshot.arrival))/86400000);
- return snapshot.rates.filter(r=>r.roomId===id).map(rate=>{
-  const prices={};
-  if(demo){for(const [code,value] of Object.entries(demo.prices))prices[code]=Math.round(value*(rate.planId==='615963'?1.2:1))}
-  else if(nights){for(const [code,value] of Object.entries(rate.prices))prices[code]=Math.round(value/baseNights*nights)}
-  return {...rate,prices};
- }).sort((a,b)=>Number(b.planId==='612820')-Number(a.planId==='612820'));
-}
+function ratesFor(id){return snapshot.rates.filter(r=>r.roomId===id).sort((a,b)=>Number(b.planId==='612820')-Number(a.planId==='612820'))}
 function amount(rate){return matchSnapshot(context.state)?rate?.prices[currency]:undefined}
 function modal(title,body,footer=''){
  const d=document.querySelector('#booking-ui-dialog');d.innerHTML=`<div class="ui-dialog-head"><h2 id="ui-dialog-title">${esc(title)}</h2><button class="ui-icon-button" data-close aria-label="Закрыть">${icon('x')}</button></div><div class="ui-dialog-body">${body}</div>${footer?`<div class="ui-dialog-foot">${footer}</div>`:''}`;d.showModal();d.querySelector('[data-close]').onclick=()=>d.close();return d;
@@ -132,7 +123,7 @@ function rateHtml(room,rates){
  const selected=rates.find(r=>r.planId===selectedRates.get(room.id))||rates.find(r=>r.planId==='612820')||rates[0];
  selectedRates.set(room.id,selected.planId);
  const value=selected.prices[currency],tooSmall=room.capacity&&context.state.adults+context.state.children.length>room.capacity;
- return `<div class="room-rate-picker"><fieldset class="meal-switch"><legend class="sr-only">Питание</legend>${rates.map(rate=>`<label class="meal-switch-option ${rate.planId===selected.planId?'is-selected':''}"><input type="radio" name="tariff-${room.id}" value="${rate.planId}" data-rate-choice data-room="${room.id}" ${rate.planId===selected.planId?'checked':''}><span>${rate.planId==='615963'?'Завтрак включён':'Без питания'}</span><small class="meal-switch-price">${Number.isFinite(rate.prices[currency])?money(rate.prices[currency]):'Уточнить цену'}</small></label>`).join('')}</fieldset><div class="rate-bottom"><div class="rate-price">${Number.isFinite(value)?`<strong>${money(value)}</strong><small>За весь период</small>`:'<span>Стоимость уточняется</span><small>на выбранные даты</small>'}</div><div class="rate-booking-action"><button class="button" data-reserve="${room.id}:${selected.planId}" ${tooSmall?'disabled':''}>${tooSmall?'Недостаточно мест':'Забронировать'}</button>${Number.isFinite(value)?`<small class="rate-prepayment">Предоплата ${money(value*(selected.prepaymentPercent??50)/100)}</small>`:''}</div></div></div>`;
+ return `<div class="room-rate-picker"><fieldset class="meal-switch"><legend class="sr-only">Питание</legend>${rates.map(rate=>`<label class="meal-switch-option ${rate.planId===selected.planId?'is-selected':''}"><input type="radio" name="tariff-${room.id}" value="${rate.planId}" data-rate-choice data-room="${room.id}" ${rate.planId===selected.planId?'checked':''}><span>${rate.planId==='615963'?'Завтрак включён':'Без питания'}</span><small class="meal-switch-price">${Number.isFinite(rate.prices[currency])?money(rate.prices[currency]):'Уточнить цену'}</small></label>`).join('')}</fieldset><div class="rate-bottom"><div class="rate-price">${Number.isFinite(value)?`<strong>${money(value)}</strong><small>24–26 ноября · 2 взрослых</small>`:'<span>Стоимость уточняется</span><small>на выбранные даты</small>'}</div><div class="rate-booking-action"><button class="button" data-reserve="${room.id}:${selected.planId}" ${tooSmall?'disabled':''}>${tooSmall?'Недостаточно мест':'Забронировать'}</button>${Number.isFinite(value)&&Number.isFinite(selected.prepaymentPercent)?`<small class="rate-prepayment">Предоплата ${money(value*selected.prepaymentPercent/100)}</small>`:''}</div></div></div>`;
 }export function renderBookingCards(rooms,options){
  context=options;init();const filtered=rooms.filter(r=>chosen.has(r.id));
  // Available houses first, alternate-date houses next, insufficient capacity last.
