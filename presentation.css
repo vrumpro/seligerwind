@@ -70,3 +70,27 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 .findings p{color:#3e5367}
 @media(min-width:901px){#hero-desktop{width:min(100%,1178px,calc((100svh - 330px)*1.6))}}
 @media(max-width:600px){.findings article{padding:18px}.hero-comparison-labels{font-size:12px;margin-bottom:9px}}
+/* Distinct slides on a quiet background */
+body{background:#eef2f6}
+.presentation-header{background:#fff;max-width:none}
+.screen{width:calc(100% - 48px);max-width:1808px;margin:24px auto;padding:40px 32px 44px;background:#fff;border:1px solid #dce3eb;border-radius:20px;box-shadow:0 4px 18px #1b365007}
+.first-screen{padding-top:32px}
+footer{padding-top:12px}
+.important-panel{padding:0;border:0;background:transparent}
+.important-label{color:#52687c;background:#edf2f7}
+.important-screen h2{font-size:clamp(24px,2.4vw,34px)}
+.launch-list{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:14px;max-width:1100px}
+.launch-list li{font-size:15px;line-height:1.75;color:#4e6172;padding-left:18px;border-left:2px solid #d5e0eb}
+.launch-list strong{color:var(--ink)}
+.planned-label{display:inline-block;font-size:12px;font-weight:650;color:#52687c;margin-bottom:14px}
+.planned-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.planned-grid article{padding:24px;background:#f5f7fa;border:1px solid #e1e7ee;border-radius:12px}
+.planned-grid p,.blog-layout p{font-size:15px;line-height:1.75;color:#4e6172;margin-top:12px}
+.planned-outcome{display:flex;gap:24px;align-items:baseline;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);font-size:15px}
+.planned-outcome strong{flex-shrink:0}.planned-outcome p{color:#4e6172;line-height:1.7}
+.blog-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.blog-topics{padding:0;list-style:none;margin:18px 0 0}
+.blog-topics li{padding:13px 0;border-bottom:1px solid #e4eaf0;font-size:15px;color:#4e6172}
+.source-link{display:inline-block;font-size:12px;margin-top:20px;color:#52687c;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:900px){.screen{width:calc(100% - 32px);padding:30px 24px;margin:16px auto}.planned-grid{grid-template-columns:1fr}.blog-layout{gap:28px}.planned-outcome{display:block}.planned-outcome p{margin-top:10px}.presentation-nav{gap:12px}}
+@media(max-width:600px){.screen{width:calc(100% - 20px);padding:26px 16px;margin:12px auto;border-radius:14px}.blog-layout{grid-template-columns:1fr}.planned-grid article{padding:18px}.planned-grid p,.blog-layout p,.launch-list li{font-size:14px}.presentation-nav{gap:0 16px}}
