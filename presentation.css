@@ -39,7 +39,7 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 #hero-desktop{width:min(100%,1228px);margin-inline:auto}#hero-desktop .reveal{max-height:767px}#hero-mobile .phone-frame{max-height:800px}.screenshot-body img{max-height:none}
 /* Restrained presentation accents */
 .presentation-header{border-bottom-color:#e8edf2}
-.screen-heading h2::before{content:"";display:block;width:32px;height:3px;border-radius:2px;background:#0768ff;margin-bottom:16px}
+
 .device-tabs{background:#f0f3f7;border:1px solid #e4eaf0}
 .browser-frame{border-color:#dbe3eb;box-shadow:0 8px 28px #18334d06}
 .findings article{border:0;background:#f6f8fa;padding:22px;border-radius:12px}
@@ -59,3 +59,14 @@ h2{font-size:clamp(26px,2.8vw,40px)}
 @media(max-width:900px){.important-panel{padding:26px}.important-grid{grid-template-columns:1fr;gap:24px}}
 @media(max-width:600px){.presentation-nav{flex-wrap:wrap;justify-content:flex-start;gap:0 16px}.findings article{padding:18px}.important-panel{padding:22px 18px;border-radius:12px}.important-heading>p{font-size:14px}.important-grid{margin-top:24px}.important-sources{gap:12px}.closing-grid article{padding-left:16px}}
 @media(min-width:901px){#hero-desktop{width:min(100%,1228px,calc((100svh - 330px)*1.6));margin-inline:auto}#hero-desktop .reveal{max-height:none}}
+.hero-comparison-labels{display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:12px;font-size:13px;font-weight:700;color:#40566a;line-height:20px}
+.hero-comparison-labels>span:last-child{color:#1858a6}
+#hero-desktop{width:min(100%,1178px)}
+.findings{gap:20px}
+.findings article{border:1px solid #d6dfe8;border-top:3px solid #9aabba;background:#f2f5f8;padding:22px 24px;box-shadow:0 3px 10px #18334d06}
+.findings article:nth-child(2){border-color:#c7d9ec;border-top-color:#648fbd;background:#ecf3fb}
+.findings article:nth-child(3){border-color:#cdded7;border-top-color:#7b9e8b;background:#f0f6f3}
+.findings h3{font-size:16px;font-weight:750;color:#20384d;margin-bottom:12px}
+.findings p{color:#3e5367}
+@media(min-width:901px){#hero-desktop{width:min(100%,1178px,calc((100svh - 365px)*1.6))}}
+@media(max-width:600px){.findings article{padding:18px}.hero-comparison-labels{font-size:12px;margin-bottom:9px}}
