@@ -304,7 +304,7 @@ if(reviewsStars)reviewsStars.innerHTML=document.querySelector('.rating-stars')?.
  const stars=Array.from({length:5},(_,n)=>'<span class="'+(n<rating?'filled':'empty')+'">'+icon('star')+'</span>').join('');
  const url=/^https:\/\//.test(r.url)?r.url:'https://seligerwind.com/#reviews';
  const date=new Intl.DateTimeFormat('ru',{day:'numeric',month:'long',year:'numeric'}).format(dateValue(r.date));
- return '<article class="guest-review-card"><div class="guest-review-author"><span class="guest-review-avatar tone-'+i%4+'" aria-hidden="true">'+safe(initials)+'</span><div><h3>'+safe(r.name)+'</h3><div class="guest-review-meta"><span>'+date+'</span><a href="'+safe(url)+'" target="_blank" rel="noopener">'+safe(sources[r.service]||'Источник')+'</a></div></div></div><div class="guest-review-stars" aria-label="'+rating+' из 5">'+stars+'</div><p>'+safe(r.text)+'</p></article>';
+ return '<article class="guest-review-card"><div class="guest-review-author"><span class="guest-review-avatar tone-'+i%4+'" aria-hidden="true">'+safe(initials)+'</span><div><h3>'+safe(r.name)+'</h3><div class="guest-review-meta"><span>'+date+'</span><a href="'+safe(url)+'" target="_blank" rel="noopener">'+safe(sources[r.service]||'Источник')+'</a></div></div></div><div class="guest-review-stars" role="img" aria-label="'+rating+' из 5">'+stars+'</div><p>'+safe(r.text)+'</p></article>';
  }).join('')||'<p>По этой теме пока нет отзывов.</p>';
  }
  tabs.addEventListener('click',e=>{const b=e.target.closest('[data-review-topic]');if(b)select(Number(b.dataset.reviewTopic))});

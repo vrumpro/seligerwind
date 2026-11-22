@@ -1,8 +1,9 @@
+import {withStaticCatalog} from './static-catalog.mjs';
 import {mkdir,copyFile,cp,writeFile,readFile} from 'node:fs/promises';
-const files=['index.html','presentation.html','presentation.css','styles.css','app.js','booking.js','booking-ui.js','booking-icons.js','booking-snapshot.js','catalog.js','custom-fields.js','icons.js','liquid-glass.js','robots.txt','LUCIDE-LICENSE.txt'];
+const files=['index.html','presentation.html','presentation.css','styles.css','app.js','booking.js','booking-ui.js','booking-icons.js','booking-snapshot.js','catalog.js','custom-fields.js','icons.js','liquid-glass.js','robots.txt','sitemap.xml','LUCIDE-LICENSE.txt'];
 await mkdir('dist',{recursive:true});
 for(const file of files){
- if(file.endsWith('.css')){
+ if(file==='index.html'){await writeFile('dist/'+file,withStaticCatalog(await readFile(file,'utf8')))}else if(file.endsWith('.css')){
   const css=await readFile(file,'utf8');
   await writeFile('dist/'+file,css.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\r?\n\s*/g,''));
  }else await copyFile(file,'dist/'+file);

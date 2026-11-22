@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://vrumpro.github.io/seligerwind/sitemap.xml
