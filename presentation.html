@@ -85,7 +85,7 @@ function openScreenshots(items,index,title,button){
 gallery.querySelector('.viewer-close').onclick=()=>gallery.close();
 gallery.querySelector('.viewer-prev').onclick=()=>moveScreenshot(-1);
 gallery.querySelector('.viewer-next').onclick=()=>moveScreenshot(1);
-gallery.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();moveScreenshot(e.key==='ArrowLeft'?-1:1)}});
+gallery.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();gallery.close();return}if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();moveScreenshot(e.key==='ArrowLeft'?-1:1)}});
 gallery.addEventListener('close',()=>{animationId++;document.body.style.overflow=previousOverflow;opener?.focus({preventScroll:true})});
 let swipe;
 gallery.querySelector('.viewer-stage').addEventListener('pointerdown',e=>{if(e.pointerType==='touch')swipe={x:e.clientX,y:e.clientY}});
