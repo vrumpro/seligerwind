@@ -80,7 +80,11 @@ function init(){
   const radio=e.target.closest('[data-rate-choice]');if(!radio)return;
   selectedRates.set(radio.dataset.room,radio.value);
   if(order.has(radio.dataset.room))order.set(radio.dataset.room,snapshot.rates.find(r=>r.roomId===radio.dataset.room&&r.planId===radio.value));
-  context.refresh();document.querySelector(`[data-rate-choice][data-room="${radio.dataset.room}"]:checked`)?.focus({preventScroll:true});
+  const room=catalog.find(r=>r.id===radio.dataset.room),card=radio.closest('.booking-card');
+  card.querySelectorAll('.meal-switch-option').forEach(label=>label.classList.toggle('is-selected',label.querySelector('input').checked));
+  const updated=document.createElement('div');updated.innerHTML=rateHtml(room,ratesFor(room.id));
+  card.querySelector('.rate-bottom').replaceWith(updated.querySelector('.rate-bottom'));
+  paintOrder();
  });
  document.querySelector('#catalog').addEventListener('click',e=>{
   const page=e.target.closest('[data-alternative-page]');if(page){const id=page.dataset.alternativePage;demoDatePages.set(id,Math.max(0,Math.min(2,(demoDatePages.get(id)||0)+Number(page.dataset.step))));context.refresh();document.querySelector('[data-alternative-page="'+id+'"]:not(:disabled)')?.focus({preventScroll:true});return}

@@ -1,6 +1,6 @@
 import {roomBedrooms,renderBookingCards,resetBookingSelection,selectedCurrency,restoreBookingUi,clearBookingFilters} from './booking-ui.js';
 import {icon} from './icons.js';
-import {enhanceFields,syncFields,closePicker,positionPopover,setFieldExpanded} from './custom-fields.js';
+import {enhanceFields,syncFields,closePicker,positionPopover,setFieldExpanded,prepareMobileSearch} from './custom-fields.js';
 import {catalog as fullCatalog} from './catalog.js';
 // Winter selection: safari tents temporarily excluded; source records retained.
 const catalog=fullCatalog.filter(room=>!room.name.includes('Safari'));
@@ -19,7 +19,7 @@ function makeAges(previous=[]){ages.replaceChildren();for(let i=0;i<Number(count
 const childrenPanel=document.querySelector('#children-panel');document.body.append(childrenPanel);
 function placeChildren(){if(!childrenPanel.hidden)positionPopover(childrenPanel,document.querySelector('#children-toggle'))}
 new ResizeObserver(placeChildren).observe(childrenPanel);window.addEventListener('resize',placeChildren);window.addEventListener('scroll',placeChildren,{passive:true});
-function childrenOpen(open,focus=false){closePicker();$('#children-panel').hidden=!open;setFieldExpanded(document.querySelector('#children-toggle'),open);if(open)positionPopover(childrenPanel,document.querySelector('#children-toggle'));if(focus)(open?($('#ages select')||$('#add-child')):$('#children-toggle')).focus({preventScroll:true})}
+function childrenOpen(open,focus=false){closePicker();if(open)prepareMobileSearch(document.querySelector('#children-toggle'));$('#children-panel').hidden=!open;setFieldExpanded(document.querySelector('#children-toggle'),open);if(open)positionPopover(childrenPanel,document.querySelector('#children-toggle'));if(focus)(open?($('#ages select')||$('#add-child')):$('#children-toggle')).focus({preventScroll:true})}
 $('#children-toggle').onclick=()=>childrenOpen($('#children-panel').hidden,true);
 $('#children-close').onclick=()=>childrenOpen(false,true);
 $('#add-child').onclick=()=>{if(Number(count.value)>=6)return;const current=state().children;count.value=String(current.length+1);makeAges([...current,null]);invalidate();[...ages.querySelectorAll('select')].at(-1).focus()};
@@ -416,7 +416,18 @@ function paintPhoto(){
  photoViewer.querySelector('.photo-viewer-count').textContent=(photoPosition+1)+' / '+photoSources.length;
  photoViewer.querySelectorAll('[data-photo-move]').forEach(b=>b.hidden=photoSources.length<2);
 }
-function movePhoto(step){photoPosition=(photoPosition+step+photoSources.length)%photoSources.length;paintPhoto()}
+let photoAnimation=0;
+async function movePhoto(step){
+ const token=++photoAnimation;
+ photoPosition=(photoPosition+step+photoSources.length)%photoSources.length;
+ const next=new Image();next.src=photoSources[photoPosition];try{await next.decode()}catch{}
+ if(token!==photoAnimation||!photoViewer.open)return;
+ const img=photoViewer.querySelector('.photo-viewer-image');
+ if(!motion.matches)await img.animate([{transform:'translateX(0)',opacity:1},{transform:'translateX('+(-step*48)+'px)',opacity:0}],{duration:130,easing:'ease-in'}).finished.catch(()=>{});
+ if(token!==photoAnimation||!photoViewer.open)return;
+ paintPhoto();
+ if(!motion.matches)img.animate([{transform:'translateX('+(step*48)+'px)',opacity:0},{transform:'translateX(0)',opacity:1}],{duration:220,easing:'ease-out'});
+}
 function openPhotoGallery(sources,index=0,title='Seliger Wind'){
  if(!sources.length)return;
  closePicker();childrenOpen(false);
@@ -433,7 +444,7 @@ function openPhotoGallery(sources,index=0,title='Seliger Wind'){
   photoViewer.addEventListener('pointercancel',()=>swipe=null);
   photoViewer.addEventListener('close',()=>{document.body.classList.remove('photo-modal-open');photoOrigin?.focus({preventScroll:true})});
  }
- photoSources=sources;photoPosition=Math.max(0,Math.min(index,sources.length-1));photoTitle=title;photoOrigin=document.activeElement;
+ photoAnimation++;photoSources=sources;photoPosition=Math.max(0,Math.min(index,sources.length-1));photoTitle=title;photoOrigin=document.activeElement;updatePhotoBooking();
  photoViewer.querySelector('.photo-viewer-heading>span').textContent=title;paintPhoto();
  document.body.classList.add('photo-modal-open');if(!photoViewer.open)photoViewer.showModal();
 }
@@ -454,3 +465,37 @@ document.addEventListener('click',e=>{
  const absolute=new URL(source,location.href).href,index=sources.findIndex(src=>new URL(src,location.href).href===absolute);
  e.preventDefault();e.stopImmediatePropagation();openPhotoGallery(sources,Math.max(0,index),section?.querySelector('h2')?.textContent||'Seliger Wind');
 },true);
+function updatePhotoBooking(){
+ let footer=photoViewer.querySelector('.photo-booking');
+ if(!footer){
+  footer=document.createElement('div');footer.className='photo-booking';
+  footer.innerHTML='<div class="photo-booking-info"></div><div class="photo-booking-action"><div class="photo-booking-price"></div><button type="button">Забронировать</button></div>';
+  photoViewer.append(footer);
+  footer.querySelector('button').onclick=()=>{photoViewer.close();showDemoNotice()};
+ }
+ const room=catalog.find(r=>r.photos.some(src=>photoSources.includes(src)));
+ const card=room?document.querySelector('[data-gallery="'+room.id+'"]')?.closest('.booking-card'):null;
+ const s=state(),date=v=>v?v.split('-').reverse().join('.'):'';
+ const dates=s.arrival&&s.departure?date(s.arrival)+' — '+date(s.departure):'Даты не выбраны';
+ footer.querySelector('.photo-booking-info').innerHTML='<strong>'+esc(room?.name||photoTitle)+'</strong><span>'+esc(dates+' · Взрослых: '+s.adults+(s.children.length?' · Детей: '+s.children.length:''))+'</span><small>'+esc(card?.querySelector('.meal-switch-option.is-selected>span')?.textContent||'Демонстрационная версия')+'</small>';
+ const price=card?.querySelector('.rate-price strong')?.textContent,deposit=card?.querySelector('.rate-prepayment')?.textContent;
+ footer.querySelector('.photo-booking-price').innerHTML=price?'<strong>'+esc(price)+'</strong><small>За весь период'+(deposit?' · '+esc(deposit):'')+'</small>':'<small>Стоимость и бронирование недоступны в демо</small>';
+}
+(function mobileRoute(){
+ const old=document.querySelector('[data-mobile-destination="directions"]');
+ const trigger=document.createElement('button');trigger.type='button';trigger.dataset.mobileDestination='directions';
+ trigger.innerHTML=document.querySelector('.mobile-route-button>.icon').outerHTML+'<span>Маршрут</span>';
+ trigger.setAttribute('aria-haspopup','dialog');trigger.setAttribute('aria-controls','mobile-route-sheet');trigger.setAttribute('aria-expanded','false');old.replaceWith(trigger);
+ const route=document.createElement('dialog');route.id='mobile-route-sheet';route.className='mobile-contacts-sheet mobile-route-sheet';route.setAttribute('aria-labelledby','route-title');
+ route.innerHTML='<div class="mobile-sheet-handle"></div><div class="mobile-menu-heading"><h2 id="route-title">Как добраться</h2><button type="button" aria-label="Закрыть маршрут">'+icon('x')+'</button></div><p class="route-address">Тверская область, Селижаровский район, деревня Ланино, ул. Береговая, 23</p><div class="route-map"></div>';
+ route.append(document.querySelector('.mobile-route-button').cloneNode(true));document.body.append(route);
+ trigger.onclick=()=>{
+  closePicker();childrenOpen(false);
+  if(!route.querySelector('iframe')){const map=document.querySelector('#directions iframe').cloneNode(true);map.loading='eager';route.querySelector('.route-map').append(map)}
+  route.showModal();document.body.classList.add('mobile-menu-open');trigger.setAttribute('aria-expanded','true');trigger.classList.add('is-active');
+ };
+ route.querySelector('button').onclick=()=>route.close();
+ route.addEventListener('close',()=>{document.body.classList.remove('mobile-menu-open');trigger.setAttribute('aria-expanded','false');trigger.classList.remove('is-active')});
+ route.addEventListener('click',e=>{if(e.target===route){const r=route.getBoundingClientRect();if(e.clientY<r.top||e.clientY>r.bottom)route.close()}});
+ window.addEventListener('resize',()=>{if(innerWidth>760&&route.open)route.close()});
+})();

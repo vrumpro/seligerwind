@@ -33,7 +33,7 @@ export function positionPopover(panel,button){
  panel.style.top=(up?bounds.top-gap-panel.offsetHeight:bounds.bottom+gap)+'px';
 }
 function place(){if(active)positionPopover(active.panel,active.button)}
-function panelFor(button,kind){closePicker();const panel=document.createElement('div');panel.className='choice-popover '+kind;panel.id=button.id+'-panel';button.setAttribute('aria-controls',panel.id);setFieldExpanded(button,true);document.body.append(panel);active={panel,button};return panel}
+function panelFor(button,kind){closePicker();prepareMobileSearch(button);const panel=document.createElement('div');panel.className='choice-popover '+kind;panel.id=button.id+'-panel';button.setAttribute('aria-controls',panel.id);setFieldExpanded(button,true);document.body.append(panel);active={panel,button};return panel}
 function buildButton(field,calendar=false){if(controls.has(field))return controls.get(field);if(!field.id)field.id='field-'+Math.random().toString(36).slice(2);const button=document.createElement('button');button.type='button';button.id=field.id+'-control';button.className='field-control';button.setAttribute('aria-haspopup',calendar?'dialog':'listbox');button.setAttribute('aria-expanded','false');button.setAttribute('aria-label',field.getAttribute('aria-label')||field.closest('label')?.firstChild?.textContent?.trim()||'Выберите значение');field.after(button);field.hidden=true;field.tabIndex=-1;field.focus=options=>button.focus(options);controls.set(field,button);return button}
 export function syncFields(){for(const [field,button] of controls){if(!field.isConnected){controls.delete(field);continue}const calendar=field.type==='date';const end=document.querySelector('#departure');const text=field.id==='arrival'&&field.value&&end.value?shortDate(field.value)+' — '+shortDate(end.value):calendar?(field.value?field.value.split('-').reverse().join('.'):'Выберите дату'):field.selectedOptions[0]?.textContent||'Выберите';button.innerHTML='<span>'+text+'</span>'+icon(button.closest('.search-row')&&button.getAttribute('aria-expanded')==='true'?'x':calendar?'calendar-days':'chevron-down');button.disabled=field.disabled}}
 function openSelect(field,button=controls.get(field)){if(active?.button===button){closePicker();return}const numeric=field.id==='adults'||field.closest('#ages');const panel=panelFor(button,numeric?'number-options':'text-options');panel.setAttribute('role','listbox');panel.setAttribute('aria-label',button.getAttribute('aria-label'));[...field.options].filter(o=>o.value!==''&&!o.disabled).forEach(o=>{const item=document.createElement('button');item.type='button';item.className='choice-option';item.setAttribute('role','option');item.setAttribute('aria-selected',String(field.value===o.value));item.dataset.value=o.value;item.innerHTML='<span>'+o.textContent+'</span>'+(field.value===o.value?icon('check'):'');item.onclick=()=>{field.value=o.value;field.dispatchEvent(new Event('change',{bubbles:true}));syncFields();closePicker(true)};panel.append(item)});positionPopover(panel,button);(panel.querySelector('[aria-selected=true]')||panel.querySelector('button'))?.focus({preventScroll:true})}
@@ -72,3 +72,9 @@ document.addEventListener('click',e=>{
  const button=field.querySelector('.field-control,#children-toggle');
  if(button&&!button.disabled){e.preventDefault();button.click()}
 });
+export function prepareMobileSearch(button){
+ if(innerWidth>760||!button.closest('#search'))return;
+ const search=document.querySelector('#search'),header=document.querySelector('header');
+ const target=window.scrollY+search.getBoundingClientRect().top-header.getBoundingClientRect().height-12;
+ window.scrollTo({top:Math.max(0,target),behavior:'instant'});
+}

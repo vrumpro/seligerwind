@@ -1630,3 +1630,30 @@ body.photo-modal-open{overflow:hidden}
  .photo-viewer-heading>span{font-size:13px}
  .photo-viewer-count{bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 }
+.photo-viewer{padding-bottom:155px}
+.photo-viewer-count{bottom:128px}
+.photo-booking{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px 32px;background:#111214;border-top:1px solid #ffffff18}
+.photo-booking-info,.photo-booking-price{display:flex;flex-direction:column;gap:4px}
+.photo-booking-info strong{font-size:16px;font-weight:600}
+.photo-booking-info span,.photo-booking-info small,.photo-booking-price small{font-size:12px;color:#aeb4be}
+.photo-booking-action{display:flex;align-items:center;gap:24px}
+.photo-booking-price strong{font-size:22px}
+.photo-viewer .photo-booking button{width:auto;min-width:160px;height:48px;padding:12px 22px;border-radius:12px;background:var(--blue);font-size:14px;font-weight:600}
+.photo-viewer .photo-booking button:hover{background:#2380ff}
+.mobile-route-sheet .mobile-menu-heading .icon{transform:none}
+.route-address{font-size:14px;line-height:1.6;color:#66768a;margin:0 0 18px}
+.route-map{height:260px;border-radius:14px;overflow:hidden;background:#eef1f5;margin-bottom:20px}
+.route-map iframe{width:100%;height:100%;border:0}
+@media(max-width:760px){
+ .photo-viewer{padding-bottom:calc(204px + env(safe-area-inset-bottom,0px))}
+ .photo-viewer-count{bottom:calc(178px + env(safe-area-inset-bottom,0px))}
+ .photo-booking{padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));display:block}
+ .photo-booking-info strong{font-size:14px}
+ .photo-booking-info span,.photo-booking-info small,.photo-booking-price small{font-size:10px}
+ .photo-booking-action{justify-content:space-between;gap:12px;margin-top:12px}
+ .photo-booking-price{min-width:0;max-width:52%}
+ .photo-booking-price strong{font-size:20px}
+ .photo-viewer .photo-booking button{min-width:135px;padding:10px 14px;font-size:13px}
+ .mobile-route-sheet{max-height:calc(100dvh - 16px)}
+ .route-map{height:min(30dvh,260px)}
+}
