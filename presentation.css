@@ -108,3 +108,9 @@ footer{padding-top:12px}
 .card-breakdown p{font-size:15px;line-height:1.75;color:#4e6172;margin-top:8px}
 @media(max-width:900px){.presentation-header{gap:12px;padding-inline:18px}.presentation-header>a{font-size:16px}.presentation-nav{gap:12px;font-size:11px}#catalog .comparison-pair,#catalog .comparison-pair.mobile{gap:28px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.card-breakdown{gap:20px}.card-breakdown h3{font-size:16px}}
 @media(max-width:600px){.presentation-header{gap:0;padding:10px 16px;min-height:90px}.presentation-nav{width:100%;justify-content:flex-start;overflow-x:auto;gap:18px;font-size:12px;padding-bottom:2px}.presentation-nav a{flex-shrink:0}.screen{scroll-margin-top:112px}#catalog .comparison-pair,#catalog .comparison-pair.mobile{grid-template-columns:1fr}.single-card-figure{width:100%;max-width:430px;justify-self:center}.card-breakdown p,.speed-context{font-size:14px}.card-breakdown li{padding-left:42px}}
+#gallery .comparison-pair,#actions .comparison-pair{display:block}
+.feature-shot.desktop{max-width:1120px;margin:auto}
+.feature-shot.mobile{max-width:390px;margin:auto}
+@media(min-width:901px){.first-screen .intro{max-width:760px;font-size:15px}}
+@media(max-width:1100px) and (min-width:601px){.presentation-nav{gap:11px;font-size:11px}.presentation-header>a{font-size:16px}}
+@media(min-width:901px){#gallery .feature-shot.desktop{max-width:min(1120px,calc((100svh - 300px)*1.6))}}
