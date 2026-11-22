@@ -114,7 +114,7 @@ let activeMapPlace=null,mapHideTimer;
 document.querySelector('#map-points').innerHTML=mapPlaces.map(p=>'<button type="button" class="map-point" data-map-place="'+p.id+'" style="left:'+p.x+'%;top:'+p.y+'%" aria-label="'+p.name+'" aria-expanded="false" aria-controls="map-preview"></button>').join('');
 mapLegend.innerHTML=mapPlaces.map(p=>'<button type="button" data-map-place="'+p.id+'" aria-expanded="false" aria-controls="map-preview">'+p.name+'</button>').join('');
 function closeMapPreview(){clearTimeout(mapHideTimer);mapPreview.hidden=true;activeMapPlace=null;document.querySelectorAll('[data-map-place]').forEach(b=>{b.classList.remove('is-active');b.setAttribute('aria-expanded','false')})}
-function placeMapPreview(){if(!activeMapPlace)return;const w=mapRoot.clientWidth,h=mapRoot.clientHeight;const x=activeMapPlace.x/100*w,y=activeMapPlace.y/100*h;const pw=mapPreview.offsetWidth,ph=mapPreview.offsetHeight;mapPreview.style.left=Math.max(8,Math.min(w-pw-8,x-pw/2))+'px';mapPreview.style.top=Math.max(8,Math.min(h-ph-8,y>ph+24?y-ph-24:y+24))+'px'}
+function placeMapPreview(){if(!activeMapPlace||innerWidth<=760)return;const w=mapRoot.clientWidth,h=mapRoot.clientHeight;const x=activeMapPlace.x/100*w,y=activeMapPlace.y/100*h;const pw=mapPreview.offsetWidth,ph=mapPreview.offsetHeight;mapPreview.style.left=Math.max(8,Math.min(w-pw-8,x-pw/2))+'px';mapPreview.style.top=Math.max(8,Math.min(h-ph-8,y>ph+24?y-ph-24:y+24))+'px'}
 function openMapPreview(p){clearTimeout(mapHideTimer);if(activeMapPlace?.id!==p.id){activeMapPlace=p;mapPreview.innerHTML='<img src="'+(p.room?catalog.find(room=>room.id===p.room).photos[0]:'assets/map-preview-'+p.photo+'.jpg')+'" alt="'+p.name+'" width="280" height="160"><div class="map-preview-copy"><strong>'+p.name+'</strong>'+(p.room?'<button type="button" class="text-button" data-detail="'+p.room+'">Посмотреть дом '+icon('arrow-right')+'</button>':p.href?'<a class="text-button" href="'+p.href+'" target="_blank" rel="noopener">Подробнее '+icon('arrow-right')+'</a>':'<span>На территории комплекса</span>')+'</div>';mapPreview.querySelector('[data-detail]')?.addEventListener('click',()=>closeMapPreview());mapPreview.querySelector('img').onload=placeMapPreview}
  mapPreview.hidden=false;document.querySelectorAll('[data-map-place]').forEach(b=>{const active=b.dataset.mapPlace===p.id;b.classList.toggle('is-active',active);b.setAttribute('aria-expanded',String(active))});placeMapPreview()}
 for(const button of document.querySelectorAll('[data-map-place]')){
@@ -122,11 +122,11 @@ for(const button of document.querySelectorAll('[data-map-place]')){
  button.addEventListener('pointerdown',e=>touch=e.pointerType==='touch');
  button.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')openMapPreview(p)});
  button.addEventListener('focus',()=>openMapPreview(p));
- button.addEventListener('pointerleave',()=>{mapHideTimer=setTimeout(closeMapPreview,220)});
- button.addEventListener('click',()=>{openMapPreview(p);if(!touch&&button.classList.contains('map-point')){if(p.room){details(p.room);closeMapPreview()}else if(p.href)window.open(p.href,'_blank','noopener')}});
+ button.addEventListener('pointerleave',()=>{if(innerWidth>760)mapHideTimer=setTimeout(closeMapPreview,220)});
+ button.addEventListener('click',()=>{openMapPreview(p);if(innerWidth>760&&!touch&&button.classList.contains('map-point')){if(p.room){details(p.room);closeMapPreview()}else if(p.href)window.open(p.href,'_blank','noopener')}});
 }
-mapPreview.addEventListener('pointerenter',()=>clearTimeout(mapHideTimer));mapPreview.addEventListener('pointerleave',()=>{mapHideTimer=setTimeout(closeMapPreview,220)});
-document.addEventListener('pointerdown',e=>{if(!mapRoot.contains(e.target)&&!mapLegend.contains(e.target))closeMapPreview()});
+mapPreview.addEventListener('pointerenter',()=>clearTimeout(mapHideTimer));mapPreview.addEventListener('pointerleave',()=>{if(innerWidth>760)mapHideTimer=setTimeout(closeMapPreview,220)});
+document.addEventListener('pointerdown',e=>{if(!mapRoot.contains(e.target)&&!mapLegend.contains(e.target)&&!mapPreview.contains(e.target)&&!e.target.closest('.territory-map-tools'))closeMapPreview()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&activeMapPlace){const trigger=document.querySelector('.map-point[data-map-place="'+activeMapPlace.id+'"]');trigger?.focus({preventScroll:true});closeMapPreview()}});
 window.addEventListener('resize',placeMapPreview);
 const searchSurface=document.querySelector('#search');
@@ -211,7 +211,7 @@ function selectComplexVideo(index){
  if(index===complexVideoIndex)return;
  complexVideoIndex=index;const video=complexVideos[index];
  complexFilm.pause();complexFilm.poster=video.poster;complexFilm.src=video.src;complexFilm.load();
- document.querySelector('#complex-title').textContent=video.title;document.querySelector('#complex-description').textContent=video.description;
+ document.querySelector('#complex-title').textContent=video.title;document.querySelector('#complex-description').textContent=innerWidth<=760?mobileVideoDescriptions[index]:video.description;
 
  complexVideoCards.forEach((card,i)=>{card.closest('.complex-video-card').classList.toggle('is-active',i===index);card.setAttribute('aria-pressed',String(i===index));card.closest('.complex-video-card').style.setProperty('--video-progress','0%')});
  syncComplexBackground();
@@ -498,4 +498,44 @@ function updatePhotoBooking(){
  route.addEventListener('close',()=>{document.body.classList.remove('mobile-menu-open');trigger.setAttribute('aria-expanded','false');trigger.classList.remove('is-active')});
  route.addEventListener('click',e=>{if(e.target===route){const r=route.getBoundingClientRect();if(e.clientY<r.top||e.clientY>r.bottom)route.close()}});
  window.addEventListener('resize',()=>{if(innerWidth>760&&route.open)route.close()});
+})();
+// Phone layout retains the original map coordinates and source artwork.
+(function mobileTerritory(){
+ const viewport=document.createElement('div');viewport.className='territory-map-viewport';mapRoot.before(viewport);viewport.append(mapRoot);
+ const tools=document.createElement('div');tools.className='territory-map-tools';
+ tools.innerHTML='<span>Листайте карту пальцем</span><div><button type="button" aria-label="Уменьшить карту">'+icon('minus')+'</button><button type="button" aria-label="Увеличить карту">'+icon('plus')+'</button></div>';
+ viewport.before(tools);
+ let width=760;
+ const [minus,plus]=tools.querySelectorAll('button');
+ function zoom(step){
+  const center=(viewport.scrollLeft+viewport.clientWidth/2)/mapRoot.offsetWidth;
+  width=Math.max(560,Math.min(1200,width+step));mapRoot.style.setProperty('--mobile-map-width',width+'px');
+  viewport.scrollLeft=center*width-viewport.clientWidth/2;
+  minus.disabled=width<=560;plus.disabled=width>=1200;
+ }
+ minus.onclick=()=>zoom(-160);plus.onclick=()=>zoom(160);
+ document.querySelectorAll('[data-map-place]').forEach(button=>button.addEventListener('click',()=>{
+  if(innerWidth>760)return;
+  const p=mapPlaces.find(p=>p.id===button.dataset.mapPlace);
+  viewport.scrollTo({left:p.x/100*mapRoot.offsetWidth-viewport.clientWidth/2,behavior:motion.matches?'instant':'smooth'});
+ }));
+ function adapt(){
+  if(innerWidth<=760){viewport.after(mapPreview);mapPreview.style.left='';mapPreview.style.top='';requestAnimationFrame(()=>{viewport.scrollLeft=Math.max(0,(mapRoot.offsetWidth-viewport.clientWidth)/2)})}
+  else{mapRoot.append(mapPreview);placeMapPreview()}
+ }
+ matchMedia('(max-width:760px)').addEventListener('change',adapt);adapt();
+})();
+const mobileVideoDescriptions=[
+ 'Дома и виллы среди сосен у озера Волго. Посмотрите территорию и варианты размещения.',
+ 'Панорамные окна, натуральные материалы и своя терраса. Посмотрите виллы снаружи и внутри.',
+ 'Качели, горки и песочница среди сосен — прямо на территории комплекса.'
+];
+(function mobileVideoLayout(){
+ const section=document.querySelector('#complex'),panel=section.querySelector('.complex-panel'),intro=section.querySelector('.complex-intro'),content=section.querySelector('.complex-content'),list=section.querySelector('.complex-video-list'),cta=section.querySelector('.complex-booking-cta');
+ function adapt(){
+  if(innerWidth<=760){section.prepend(intro);panel.after(list);list.after(cta)}
+  else{content.prepend(intro);intro.append(cta);panel.append(list)}
+  document.querySelector('#complex-description').textContent=innerWidth<=760?mobileVideoDescriptions[complexVideoIndex]:complexVideos[complexVideoIndex].description;
+ }
+ matchMedia('(max-width:760px)').addEventListener('change',adapt);adapt();
 })();

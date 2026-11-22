@@ -1657,3 +1657,44 @@ body.photo-modal-open{overflow:hidden}
  .mobile-route-sheet{max-height:calc(100dvh - 16px)}
  .route-map{height:min(30dvh,260px)}
 }
+/* Shared booking calls to action. */
+.territory-action .section-booking-cta{min-height:54px;min-width:230px;padding:14px 24px;border:0;border-radius:14px;background:var(--blue);color:white;font-size:15px;font-weight:600;box-shadow:0 5px 16px #0468ff18;gap:24px}
+.territory-action .section-booking-cta:hover{background:#2380ff}
+.territory-map-tools{display:none}
+@media(max-width:760px){
+ a[data-booking-cta],.section-booking-cta,.experience-pet-actions>.button{width:100%;min-height:52px;justify-content:center;border-radius:14px}
+ .territory-action{width:100%;margin-top:20px}
+ .territory-map-viewport{width:100%;overflow:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;border-radius:14px;background:#e9edf2;scrollbar-width:thin;scrollbar-color:#9eabb9 #e8edf1}
+ #territory-map{width:var(--mobile-map-width,760px);max-width:none;min-width:560px}
+ #territory-map>img{width:100%;max-width:none;border-radius:0}
+ #territory-map .map-point{min-width:44px;min-height:44px}
+ .territory-map-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+ .territory-map-tools>span{font-size:12px;color:#728095}
+ .territory-map-tools>div{display:flex;gap:8px}
+ .territory-map-tools button{display:grid;place-items:center;width:44px;height:44px;padding:10px;border:1px solid #e0e6ed;border-radius:12px;background:#fff;color:#203952}
+ #territory>#map-preview{position:relative;left:auto!important;top:auto!important;width:100%;margin-top:14px;display:grid;grid-template-columns:112px minmax(0,1fr);border:1px solid #e2e8ef;box-shadow:none;border-radius:14px}
+ #territory>#map-preview>img{width:112px;height:110px}
+ #territory .map-preview-copy{padding:14px;justify-content:center}
+ #map-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-top:16px}
+ #map-legend button{min-width:0;min-height:44px;padding:10px 12px;text-align:left;font-size:12px;line-height:1.35;border-radius:10px;background:#fff;border:1px solid #e4e9f0}
+ #map-legend button.is-active{background:#edf4ff;border-color:#a4c8ff}
+ #complex{width:100%;padding:28px 16px;margin:20px 0;background:#fff}
+ #complex>.complex-intro{max-width:none;padding:0;margin:0 0 20px;min-height:0}
+ #complex>.complex-intro>h2{color:var(--ink);font-size:26px;line-height:1.2;margin:0 0 12px;text-wrap:initial}
+ #complex #complex-description{font-size:14px;line-height:1.6;color:#6b7b8d;max-width:none;margin:0}
+ #complex .complex-panel{display:block;height:auto;min-height:0;max-height:none;aspect-ratio:16/10;border-radius:16px;overflow:hidden}
+ #complex .complex-video{min-height:0;border-radius:0}
+ #complex .complex-video video{object-fit:contain}
+ #complex .complex-overlay{border-radius:0;background:linear-gradient(0deg,#071421b3,transparent 50%)}
+ #complex .complex-content{height:100%;padding:12px;display:flex;justify-content:flex-end;align-items:center}
+ #complex .complex-playback{margin:0;gap:12px;padding:4px 8px;border-radius:14px;background:#071421a6}
+ #complex .complex-playback button{width:40px;height:40px}
+ #complex>.complex-video-list{position:static;transform:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;max-width:none;margin:12px 0 0;padding:0;background:transparent;border:0;border-radius:0;overflow:visible;box-shadow:none}
+ #complex>.complex-video-list .complex-video-card{padding:7px;background:#f3f5f8;color:var(--ink);border:1px solid transparent;border-radius:12px;box-shadow:none}
+ #complex>.complex-video-list .complex-video-card.is-active{background:#edf4ff;border:1px solid #a6c9ff}
+ #complex>.complex-video-list .complex-video-name,#complex>.complex-video-list .complex-video-card.is-active .complex-video-name{color:#243b54;font-size:11px}
+ #complex>.complex-video-list .complex-video-card:before{background:#0468ff0c}
+ #complex>.complex-video-list .complex-video-card:after{background:var(--blue)}
+ #complex>.complex-booking-cta{display:flex;margin-top:18px;background:var(--blue);color:#fff;min-height:52px}
+}
+@media(max-width:760px){#complex .complex-duration{background:#071421cc;color:#fff}#complex>.complex-video-list .complex-preview{opacity:1}}
